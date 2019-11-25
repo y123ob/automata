@@ -1,0 +1,90 @@
+#!/bin/bash
+
+TESTCASES=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39)
+WTESTCASES=(0 1 2 3 4 5 6 7 8 9)
+TESTDIR="testcase"
+
+TACASE="sample1"
+
+WRONG="$(tput setaf 1)✗$(tput sgr0)"
+CORRECT="$(tput setaf 2)✓$(tput sgr0)"
+
+function result {
+    if [ "$1" != 0 ]
+    then
+        echo "${WRONG}"
+    else
+        echo "${CORRECT}"
+    fi
+}
+
+
+echo '# Compiling...'
+if ! (make $1)
+then
+    echo ''
+    echo 'Compile fail.'
+    exit 1
+fi
+echo ''
+
+
+echo '# Running testcases...'
+
+for TC in "${TESTCASES[@]}"
+do
+    case $2 in
+        r)
+            COM="python3 expGen.py ${TC}"
+            ;;
+        n)
+            COM="echo pass generating testcase"
+    esac
+    eval "${COM}"
+    TFILE="${TESTDIR}/ex${TC}"
+    printf "Test %s..." "${TC}"
+    case $1 in
+        c)
+            COMM="./hw2 ${TFILE}.in ${TFILE}.out"
+            ;;
+        cpp)
+            COMM="./hw2 ${TFILE}.in ${TFILE}.out"
+            ;;
+        py)
+            COMM="python hw2.py ${TFILE}.in ${TFILE}.out"
+            ;;
+        py3)
+            COMM="python3 hw2.py ${TFILE}.in ${TFILE}.out"
+            ;;
+        java)
+            COMM="java hw2 ${TFILE}.in ${TFILE}.out"
+    esac
+    eval "${COMM}"
+    eval "diff <(head -n 1 ${TFILE}.ans) <(head -n 1 ${TFILE}.out) > /dev/null"
+    result $?
+done
+for TC in "${WTESTCASES[@]}"
+do
+    eval "${COM}"
+    TFILE="${TESTDIR}/wex${TC}"
+    printf "Test %s..." "${TC}"
+    case $1 in
+        c)
+            COMM="./hw2 ${TFILE}.in ${TFILE}.out"
+            ;;
+        cpp)
+            COMM="./hw2 ${TFILE}.in ${TFILE}.out"
+            ;;
+        py)
+            COMM="python hw2.py ${TFILE}.in ${TFILE}.out"
+            ;;
+        py3)
+            COMM="python3 hw2.py ${TFILE}.in ${TFILE}.out"
+            ;;
+        java)
+            COMM="java hw2 ${TFILE}.in ${TFILE}.out"
+    esac
+    eval "${COMM}"
+    eval "diff <(head -n 1 ${TFILE}.ans) <(head -n 1 ${TFILE}.out) > /dev/null"
+    result $?
+done
