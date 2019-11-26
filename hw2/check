@@ -28,19 +28,18 @@ then
 fi
 echo ''
 
-
+eval "${COM}"
 echo '# Running testcases...'
+case $2 in
+    r)
+        COM="python3 expGen.py"
+        ;;
+    n)
+        COM="echo pass generating testcase"
+esac
 
 for TC in "${TESTCASES[@]}"
-do
-    case $2 in
-        r)
-            COM="python3 expGen.py ${TC}"
-            ;;
-        n)
-            COM="echo pass generating testcase"
-    esac
-    eval "${COM}"
+do    
     TFILE="${TESTDIR}/ex${TC}"
     printf "Test %s..." "${TC}"
     case $1 in
@@ -65,7 +64,6 @@ do
 done
 for TC in "${WTESTCASES[@]}"
 do
-    eval "${COM}"
     TFILE="${TESTDIR}/wex${TC}"
     printf "Test %s..." "${TC}"
     case $1 in
